@@ -7,7 +7,10 @@
 
         static void Main(string[] args)
         {
-            equipamentos[contadorEquipamentosCadastrados++] = new("Fritadeira", 1300, "1", DateTime.Now, "Acer");
+            Equipamento equipamentoTeste = new Equipamento("Fritadeira", 1300, "1", DateTime.Now, "Acer");
+            equipamentoTeste.Id = GeradorId.GerarIdEquipamento();
+
+            equipamentos[contadorEquipamentosCadastrados++] = equipamentoTeste;
 
             bool opcaoSairEscolhida = false;
             while (!opcaoSairEscolhida)
@@ -120,7 +123,9 @@
                 string fabricante = Console.ReadLine();
                 Console.WriteLine();
 
-                Equipamento novoEquipamento = new(nome, precoAquisicao, numeroSerie, dataFabricacao, fabricante);
+                Equipamento novoEquipamento =
+                    new(nome, precoAquisicao, numeroSerie, dataFabricacao, fabricante);
+                novoEquipamento.Id =GeradorId.GerarIdEquipamento();
 
                 equipamentos[contadorEquipamentosCadastrados++] = novoEquipamento;
 
@@ -177,37 +182,50 @@
             VisualizarEquipamento(false);
 
             Console.Write("Digite o ID do equipamento a ser editado: ");
-            int equipamentoSelecionado = Convert.ToInt32(Console.ReadLine());
+            int idEquipamentoSelecionado = Convert.ToInt32(Console.ReadLine());
 
-            Equipamento equipamentoEncontrado = SelecionarEquipamentoPorId(equipamentoSelecionado);
+            if (!EquipamentoExiste(idEquipamentoSelecionado))
+            {
+                ExibirMensagem("O Equipamento selecionado não existe!", ConsoleColor.Red);
+
+            }
 
             Console.WriteLine();
 
             Console.Write("Digite o Nome do Equipamento: ");
-            equipamentoEncontrado.Nome = Console.ReadLine();
+            string nome = Console.ReadLine();
 
             Console.Write("Digite o preço de aquisição do Equipamento: ");
-            equipamentoEncontrado.PrecoAquisicao = Convert.ToDecimal(Console.ReadLine());
+            decimal precoAquisicao = Convert.ToDecimal(Console.ReadLine());
 
             Console.Write("Digite o número de série do Equipamento: ");
-            equipamentoEncontrado.NumeroSerie = Console.ReadLine();
+            string numeroSerie = Console.ReadLine();
 
             Console.Write("Digite a data de fabricação do Equipamento (dd - MM - aaaa): ");
 
-            equipamentoEncontrado.DataFabricacao = Convert.ToDateTime(Console.ReadLine());
+            DateTime dataFabricacao = Convert.ToDateTime(Console.ReadLine());
 
             Console.Write("Digite o Fabricante do Equipamento: ");
-            equipamentoEncontrado.Fabricante = Console.ReadLine();
+            string fabricante = Console.ReadLine();
 
-            Console.ForegroundColor = ConsoleColor.Green;
+            Equipamento novoEquipamento =
+                new Equipamento(nome, precoAquisicao, numeroSerie, dataFabricacao, fabricante);
 
-            Console.WriteLine();
+            novoEquipamento.Id = idEquipamentoSelecionado;
 
-            Console.WriteLine("O equipamento foi Editado com sucesso!");
+            for (int i = 0; i < equipamentos.Length; i++)
+            {
+                if (equipamentos[i] == null)
+                    continue;
 
-            Console.ResetColor();
+                else if (equipamentos[i].Id == idEquipamentoSelecionado)
+                {
+                    equipamentos[i] = novoEquipamento;
+                    break;
+                }
+            }
 
-            Console.ReadLine();
+            ExibirMensagem("O Equipamento foi editado com sucesso!", ConsoleColor.Green);
         }
 
         public static Equipamento SelecionarEquipamentoPorId(int idSelecionado)
@@ -244,21 +262,51 @@
             Console.Write("Digite o ID do equipamento a ser excluido: ");
             int equipamentoSelecionado = Convert.ToInt32(Console.ReadLine());
 
-            Equipamento equipamentoEncontrado = SelecionarEquipamentoPorId(equipamentoSelecionado);
-
-            for (int i = 0; i < equipamentos.Length; ++i)
+            if (!EquipamentoExiste(equipamentoSelecionado))
             {
-                Equipamento e = equipamentos[i];
+                Console.WriteLine("O Equipamento não pode ser encontrado, tente novamente");
+            }
 
-                if (e == null)
+            for (int i = 0; i < equipamentos.Length; i++)
+            {
+                if (equipamentos[i] == null)
                     continue;
 
                 else if (equipamentos[i].Id == equipamentoSelecionado)
                 {
                     equipamentos[i] = null;
-                    return;
+
+                    ExibirMensagem("O Equipamento foi exlcuido com sucesso", ConsoleColor.Green);
                 }
             }
+        }
+
+        private static void ExibirMensagem(string mensagem, ConsoleColor cor)
+        {
+            Console.ForegroundColor = cor;
+
+            Console.WriteLine();
+
+            Console.WriteLine(mensagem);
+
+            Console.ResetColor();
+
+            Console.ReadLine();
+        }
+
+        private static bool EquipamentoExiste(int idSelecionado)
+        {
+            for (int i = 0; i < equipamentos.Length; i++)
+            {
+                Equipamento e = equipamentos[i];
+
+                if (e == null) // continue (não parar o ciclo)
+                    continue;
+
+                else if (e.Id == idSelecionado)
+                    return true;
+            }
+            return false;
         }
     }
 }

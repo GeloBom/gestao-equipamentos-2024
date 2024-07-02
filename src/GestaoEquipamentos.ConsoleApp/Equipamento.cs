@@ -12,7 +12,6 @@ namespace Controle_De_Equipamentos.ConsoleApp
 
         public Equipamento(string nome, decimal precoAquisicao, string numeroSerie, DateTime dataFabricacao, string fabricante)
         {
-            Id = GeradorId.GerarIdEquipamento();
             Nome = nome;
             PrecoAquisicao = precoAquisicao;
             NumeroSerie = numeroSerie;
